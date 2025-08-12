@@ -1,73 +1,96 @@
-# Welcome to your Lovable project
+# Deploying a Vite React App to GitHub Pages
 
-## Project info
+This guide explains how to build and publish your Vite React project to **GitHub Pages**, and how to republish it if it gets unpublished.
 
-**URL**: https://lovable.dev/projects/e77f427f-d01e-4251-a8e2-33b58350c4bd
+---
 
-## How can I edit this code?
+## 1️⃣ Configure `vite.config.js`
+Edit `vite.config.js` and set the correct **base** path:
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/e77f427f-d01e-4251-a8e2-33b58350c4bd) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+- If your repo name is **`my-app`**:
+```js
+base: '/my-app/'
 ```
 
-**Edit a file directly in GitHub**
+- If your repo name is `username.github.io`:
+```js
+base: '/'
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Example:
+```js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
-**Use GitHub Codespaces**
+export default defineConfig({
+  plugins: [react()],
+  base: '/REPO-NAME/' // change this to match your repo
+})
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## 2️⃣ Install Deployment Tool
 
-This project is built with:
+We’ll use the `gh-pages` package to push the build to GitHub.
+```bash
+npm install --save-dev gh-pages
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## 3️⃣ Add Scripts to package.json
+Open `package.json` and add:
+```json
+"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview",
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d dist"
+}
+```
 
-Simply open [Lovable](https://lovable.dev/projects/e77f427f-d01e-4251-a8e2-33b58350c4bd) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+## 4️⃣ First Deployment
+```bash
+npm run deploy
+```
+This will:
+1. Build the app (`npm run build`)
+2. Push the `dist/` folder to a branch called `gh-pages`
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 5️⃣ Enable GitHub Pages
+1. Go to your repository on GitHub.
+2. Navigate to Settings → Pages.
+3. Under Source, select:
+    - Branch: gh-pages
+    - Folder: / (root)
+4. Save.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+---
+
+## 6️⃣ Redeploy if Unpublished
+If your page is unpublished for any reason, just run:
+```bash
+npm run deploy
+```
+
+---
+
+Then verify that GitHub Pages is still enabled on the `gh-pages` branch.
+
+## 7️⃣ View Your Site
+After a minute, your app will be live at:
+```cpp
+https://USERNAME.github.io/REPO-NAME/
+```
+
+---
+
+## 🛠 Common Issues
+- Wrong MIME type: Make sure `base` in `vite.config.js` matches your repo name.
+- 404 errors on reload: GitHub Pages doesn’t handle client-side routing by default. Consider adding a `404.html` copy of `index.html`.
